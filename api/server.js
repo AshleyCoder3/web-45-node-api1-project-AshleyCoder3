@@ -44,20 +44,25 @@ server.post('/api/users', (req, res) => {
 })
 server.put('/api/users/:id', (req, res) => {
     const { id } = req.params
-    const { name, bio } = req.body
-    User.update(id, { name, bio })
-        .then(updatedUser => {
-            if (!updatedUser.name || !updatedUser.bio) {
-                res.status(400).json({ message: "Please provide name and bio for the user" })
-            } if (!updatedUser.id) {
-                res.status(404).json({ message: "The user with the specified ID does not exist" })
-            } else {
-                res.status(200).json(updatedUser)
-            }
-        })
-        .catch(err => {
-            res.status(500).json({ message: 'The user information could not be modified' })
-        })
+    const user = req.body
+
+    if (!user.name || !user.bio) {
+        res.status(400).json({ message: "Please provide name and bio for the user" })
+    }
+    else {
+        User.update(id, user)
+            .then((updatedUser) => {
+                console.log(updatedUser)
+                if (updatedUser) {
+                    res.status(200).json(updatedUser)
+                } else {
+                    res.status(404).json({ message: "The user with the specified ID does not exist" })
+                }
+            })
+            .catch(err => {
+                res.status(500).json({ message: 'The user information could not be modified' })
+            })
+    }
 })
 server.delete('/api/users/:id', (req, res) => {
     const { id } = req.params
